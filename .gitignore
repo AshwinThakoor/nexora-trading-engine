@@ -11,6 +11,16 @@ __pycache__/
 *.pkl
 *.joblib
 *.ex5
+# Analytics output and generated summaries
+analytics/reports/
+analytics/features/*.txt
+analytics/learning/*.txt
+analytics/regimes/*.txt
+# Legacy/backup signal server snapshots
+signal_server_backup.py
+signal_server_old.py
+signal_server_phase13_5_backup.py
+signal_server_phase15_backup.py
 # Local audit and backup files
 *.zip
 *.sql
@@ -23,3 +33,11 @@ mt5_ai_bot_git_backup/
 .venv-*/
 **/.venv/
 **/.venv-*/
+
+# Local environment files
+.env
+.env.*
+
+# OS and editor temporary files
+.DS_Store
+Thumbs.db
