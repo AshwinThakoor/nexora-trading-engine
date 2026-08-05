@@ -1,0 +1,25 @@
+data/
+models/
+logs/
+.venv/
+.venv-1/
+.venv-2/
+.venv-3/
+__pycache__/
+*.csv
+*.parquet
+*.pkl
+*.joblib
+*.ex5
+# Local audit and backup files
+*.zip
+*.sql
+project_tree.txt
+repository_structure.txt
+mt5_ai_bot_git_backup/
+
+# Python environments at any depth
+.venv/
+.venv-*/
+**/.venv/
+**/.venv-*/
