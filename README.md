@@ -1,3 +1,8 @@
+# MT5 AI Trading Engine
+
+This component is part of the NEXORA repository and is intended for research and prototype use only.
+See the root `README.md` for repository-level context and safety guidance.
+
 ## MT5 XAUUSD AI Trading Bot
 
 This project is a serious **MT5 Expert Advisor + Python AI server** for trading **XAUUSD on M5**.  
