@@ -1,46 +1,114 @@
-# Model and Data Policy
+# NEXORA — Model, Data & Intellectual-Property Policy
 
-This repository export is intentionally focused on source code, documentation, and tooling.
+This public repository is a **sanitized engineering showcase**, not a reproducible distribution of the complete NEXORA trading system.
 
-## What belongs in this repository
+The policy exists for three reasons: protect credentials/private data, prevent accidental publication of proprietary trading logic, and keep the repository useful to technical reviewers without making the active system clonable.
 
-- Python server code and app logic.
-- MT5 signal server integration code.
-- Data-processing and analytics tooling.
-- Documentation, architecture notes, and readme information.
+## Classification model
 
-## What does not belong in this repository
+```mermaid
+flowchart LR
+    ITEM[Project Artifact] --> Q{Safe for public portfolio?}
+    Q -->|Documentation / generic analytics| PUBLIC[Public Repository]
+    Q -->|Strategy / model / runtime data| PRIVATE[Private Repository / Local Storage]
+    Q -->|Secret / credential| SECRET[Secret Store / Environment]
+```
 
-- Trained model artifacts:
-  - `models/*.pkl`
-  - `models/*.joblib`
-  - `models/*.json` model metadata files used only for runtime.
-- Runtime data and logs:
-  - `data/*.csv`, `data/*.parquet`
-  - `logs/*.csv`
-  - local MT5 common files like `ai_trade_log.csv` and `ai_decision_log.csv`
-- Generated analytics outputs and reports:
-  - `analytics/reports/*`
-  - `analytics/features/*.txt`
-  - `analytics/learning/*.txt`
-  - `analytics/regimes/*.txt`
-- Backup or historical phase snapshots of the signal server:
-  - `signal_server_backup.py`
-  - `signal_server_old.py`
-  - `signal_server_phase13_5_backup.py`
-  - `signal_server_phase15_backup.py`
+## Public-safe material
 
-## Recommended workflow for using this export
+The public repository may contain:
 
-1. Keep source-controlled files limited to code, docs, and tooling.
-2. Use local data and model training pipelines to reproduce generated artifacts.
-3. Keep runtime outputs and model binaries out of git to maintain a clean, portable repo.
-4. Add additional `.gitignore` rules for any new local artifacts created during development.
+- high-level architecture and component diagrams;
+- selected analytics/reporting code;
+- generic data-cleaning and evaluation utilities;
+- sanitized configuration examples;
+- testing and CI definitions that do not contact brokers;
+- documentation of technology choices and engineering principles;
+- model/data interface descriptions that do not reveal active formulas or weights.
 
-## Rebuilding models and reports
+## Private model material
 
-Use the tools in `tools/` and the Python application scripts to rebuild datasets and analytics when needed.
+The following are not intended for public source control:
 
-- `tools/build_training_events.py` for training event datasets.
-- `tools/merge_history.py` for candle history merging.
-- `analytics/` code for feature extraction and report generation.
+- fitted `.pkl` / `.joblib` model binaries;
+- active model metadata when it exposes the feature set or runtime configuration;
+- training recipes that reproduce proprietary strategy behavior;
+- exact model/ensemble thresholds;
+- calibration or decision rules used by the active system;
+- private evaluation outputs that reveal strategy performance or behavior in excessive detail.
+
+## Private data
+
+Excluded data includes:
+
+- raw/historical market datasets used by the active project;
+- locally collected candle logs;
+- trade logs and decision logs;
+- account/broker exports;
+- generated feature datasets;
+- training-event datasets;
+- private backtest/forward-test artifacts;
+- any dataset containing account identifiers or operational information.
+
+The `.gitignore` excludes broad runtime artifact classes including `data/`, `models/`, `logs/`, CSV/Parquet data and serialized model formats.
+
+## Proprietary strategy boundary
+
+The public repository should not contain enough information to reconstruct the active strategy. Keep private:
+
+- exact feature-engineering formulas used by the active model;
+- decision-fusion/scoring algorithms;
+- confidence gates and tuned thresholds;
+- session/regime scoring rules;
+- detailed position-sizing rules;
+- exact stop-loss/take-profit parameterization;
+- execution overrides;
+- complete Expert Advisor strategy implementation;
+- active signal-server decision logic.
+
+## Credentials and secrets
+
+Never commit:
+
+- broker usernames/passwords;
+- API tokens;
+- private keys;
+- webhook secrets;
+- database credentials;
+- real session/authentication secrets;
+- `.env` files containing operational values.
+
+Use environment variables or an appropriate secrets provider for operational deployments.
+
+## Public analytics philosophy
+
+Analytics can be public when they demonstrate transferable engineering skills without encoding the strategy itself. Examples include generic P&L aggregation, drawdown calculation, confidence-distribution analysis, segmented evaluation and report generation.
+
+```mermaid
+flowchart LR
+    PRIVATE_LOGS[Private Runtime Logs] -. local input .-> ANALYTICS[Public Analytics Logic]
+    ANALYTICS --> REPORTS[Generated Reports]
+    REPORTS -. excluded from Git .-> LOCAL[Local Research Workspace]
+```
+
+The logic can therefore be reviewed while the underlying operational data remains private.
+
+## Repository review checklist
+
+Before publishing a new file, verify that it contains none of the following:
+
+- secret values or account identifiers;
+- model binaries or private datasets;
+- tuned trading thresholds;
+- active execution rules;
+- private broker paths/configuration containing personal information;
+- proprietary formulas that materially reproduce the strategy;
+- generated logs or reports that should remain local.
+
+## Git-history warning
+
+Removing a sensitive file from the current branch does **not** guarantee that earlier public commits no longer contain it. History sanitization is a separate operation and prior public clones cannot be revoked. This repository should therefore be treated as having had earlier development history, while the current branch is maintained as the sanitized portfolio surface.
+
+## Licensing
+
+This repository is **All Rights Reserved**. Public visibility is provided for portfolio/review purposes and does not grant permission to copy, redistribute or modify the source. See `LICENSE` for the repository terms.
