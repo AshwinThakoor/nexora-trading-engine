@@ -1,1 +1,125 @@
-# NEXORA Trading Engine[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) [![Status](https://img.shields.io/badge/status-research-orange.svg)]() [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)]()Author: Ashwin ThakoorThis repository contains the NEXORA trading-engine research/demo components used to support signal generation, analytics and a lightweight API used in research workflows. It is not an audited production trading system � do not run with live capital unless you have independently verified safety, execution and compliance.Key capabilities documented here:- FastAPI-based HTTP API layer (exploration and control endpoints)- SQLAlchemy ORM models and Alembic migrations for schema management- Source Registry and Document Registry abstractions for ingested content- Secure storage abstraction for secrets and sensitive blobs- Ingestion orchestration with parsers for TXT, PDF, DOCX, Markdown and HTML- Persistent ParseResult storage, deterministic chunking and provenance metadata- Academy: curriculum, learner progress, assessments, grading and reviews (research features)--## Quick badges & links- Swagger UI: `/docs` (when FastAPI server running)- ReDoc: `/redoc` (when FastAPI server running)--## Architecture (high level)```mermaidflowchart LR	subgraph API		A[FastAPI endpoints] -->|queries| B[(SQLAlchemy / Alembic DB)]		A --> C[Source Registry]		A --> D[Document Registry]	end	C --> E[Ingestion Orchestrator]	E --> F{Parsers}	F --> F1[TXT]	F --> F2[PDF]	F --> F3[DOCX]	F --> F4[Markdown]	F --> F5[HTML]	F --> G[Deterministic Chunking]	G --> H[ParseResult storage with provenance]	H --> B	subgraph Storage		B --> S[Secure Storage (secrets, blobs)]	end	A -->|auth| Auth[Authorization Layer]	note right of H: Academy features ingest ParseResults```--## Windows quick start1. Create and activate a virtualenv (PowerShell):```powershellpython -m venv .venv.\.venv\Scripts\Activate.ps1pip install -r requirements.txt```2. Run FastAPI for local exploration:```powershelluvicorn signal_server:app --reload --host 127.0.0.1 --port 8000# Open http://127.0.0.1:8000/docs and /redoc```## Linux / macOS quick start```bashpython3 -m venv .venvsource .venv/bin/activatepip install -r requirements.txtuvicorn signal_server:app --reload --host 127.0.0.1 --port 8000# Visit http://127.0.0.1:8000/docs and /redoc```--## Components (explanations)- FastAPI: lightweight HTTP API that exposes exploration, ingestion triggers and administrative routes. Swagger UI available at `/docs` and ReDoc at `/redoc` when the server is running.- SQLAlchemy: ORM models persist Domain objects including Sources, Documents, ParseResults, chunks, Academy progress and assessments. Use the SQLAlchemy session factory in the codebase for DB access.- Alembic: migrations live in `alembic/` (if present). Typical workflow:```bashalembic upgrade headalembic revision --autogenerate -m "describe change"```- Source Registry: in-repo abstraction that tracks external input sources (file drops, feeds). Each Source provides metadata and ingestion state.- Document Registry: tracks individual documents derived from Sources; each Document is immutable once created and is linked to ParseResults and provenance metadata.- Secure storage: pluggable storage provider used for storing secrets and binary blobs out-of-band from the main DB. Do not commit credentials; configure via environment variables or a secrets provider.- Ingestion orchestration: an orchestrator component accepts Sources, runs parsers, applies deterministic chunking and writes ParseResults with provenance to persistent storage.- Parsers: implemented for TXT, PDF, DOCX, Markdown and HTML. These parsers extract text, metadata and basic structure. Unsupported formats (e.g., EPUB) are not claimed.- ParseResult storage: parsed outputs are stored persistently (DB rows + optional blob store). Each ParseResult includes chunk IDs, offsets, checksums and source provenance to enable deterministic reprocessing.- Deterministic chunking & provenance: text is chunked using deterministic rules (token/character windows, overlap) and provenance records original document offsets, parser version and chunk checksum.- Academy features: research scaffolding for curriculum items, learner progress, assessments, grading and reviews. These are experimental and intended for internal study; they rely on ParseResults to present learning content and record progress.--## API routes (examples)- `GET /health` � basic health check- `GET /sources` � list registered sources- `POST /sources` � register a new source- `POST /ingest` � trigger ingestion for a source/document- `GET /documents/{id}` � fetch document metadata and provenance- `GET /parse-results/{id}` � fetch parse result and chunk listing- `GET /academy/curriculum` � fetch curriculum items- `POST /academy/progress` � report learner progressCheck the FastAPI app module (e.g., `signal_server.py`) for the full route set and parameter details.--## AuthorizationThe API uses a simple pluggable authorization layer. For research deployments, configure an API token or an OAuth proxy in front of the service. Do not expose the API server directly to public networks without an authentication gateway.--## Testing- Unit tests: `pytest`-based tests are included under `tests/` when present. Run locally with `pytest -q`.- Static checks: `python -m compileall .` and AST-based checks are recommended for CI. Avoid running any network or broker connections in CI.--## Setup & configuration- `requirements.txt` should hold runtime dependencies (FastAPI, uvicorn, SQLAlchemy, alembic, parsing libs).- Configuration is read from environment variables and `.env` (not committed). Key variables include DB URL, secret store credentials, and API auth tokens.Example env vars:```textDATABASE_URL=sqlite:///./nexora.sqliteSECRET_STORE_URL=API_TOKEN=```--## Known limitations- Research/demo quality: many components are experimental and not hardened for production use.- No built-in rate limiting or hardened authentication by default.- Parsers extract text and basic metadata but are not a full document understanding pipeline.- Storage and secret management are pluggable but require configuration and review before any real deployment.--## Roadmap- Harden authentication and add rate limiting- Add integration tests for ingestion pipelines- Expand parser coverage and add richer metadata extraction- Add optional vector-store connector for downstream search/ML use cases--## Security- Do not commit secrets, model weights or dataset dumps.- Use environment variables or a secrets manager for credentials.- Run the API behind an authenticated gateway for any externally reachable deployment.--## LicenseThis repository is offered under the MIT License.See LICENSE for full text.
+# NEXORA Trading Engine
+
+![Status: Research](https://img.shields.io/badge/status-research-orange)
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![License: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
+
+**Author: Ashwin Thakoor**
+
+NEXORA is an independent AI-assisted algorithmic-trading research project built around Python, machine learning, MetaTrader 5 integration, risk controls, and trading analytics.
+
+This repository is a **recruiter-safe engineering showcase**. It intentionally excludes proprietary strategy rules, trained model artifacts, private datasets, credentials, exact decision thresholds, execution logic, and other components that could reveal the full trading system.
+
+> Research/demo software only. This repository is not financial advice and is not presented as a proven profitable or production trading system.
+
+## What this project demonstrates
+
+- Python-based quantitative/trading analytics
+- Machine-learning signal architecture
+- MetaTrader 5 integration architecture
+- FastAPI-based signal-service architecture in the private/full system
+- Trade and decision-log analysis with Pandas
+- Performance reporting and confidence analysis
+- Risk-management architecture and safety-first design
+- Modular separation between inference, execution, analytics, monitoring, and data
+- Ongoing experimentation and validation before live deployment
+
+## High-level architecture
+
+```mermaid
+flowchart LR
+    A[MT5 Expert Advisor] --> B[Signal API]
+    B --> C[Feature Pipeline]
+    C --> D[ML Inference]
+    D --> E[Risk & Policy Layer]
+    E --> F[Trade Decision]
+    F --> A
+    A --> G[Trade / Decision Logs]
+    G --> H[Analytics & Monitoring]
+```
+
+The diagram documents the complete system at an architectural level. Sensitive implementation details behind the signal, feature, risk, and execution layers are intentionally not published here.
+
+## Public showcase components
+
+The public repository focuses on safe-to-share engineering evidence such as:
+
+- analytics and reporting utilities;
+- trade/performance analysis;
+- confidence and decision-log analysis;
+- dashboard/monitoring support where safe to expose;
+- project architecture and engineering documentation;
+- model/data governance documentation;
+- configuration, testing, security and project-structure documentation.
+
+## Technologies used in the full project
+
+`Python` · `FastAPI` · `Pandas` · `NumPy` · `LightGBM` · `MetaTrader 5` · `REST APIs` · `Docker` · `WSL/Ubuntu`
+
+The primary research workflow has focused on **XAUUSD** using **M5 market data**, with higher-timeframe context and explicit risk controls.
+
+## ML workflow
+
+At a high level, the private/full NEXORA system follows this workflow:
+
+1. Receive or collect market/candle data.
+2. Validate and transform market inputs.
+3. Build engineered features.
+4. Run ML inference.
+5. Evaluate confidence and market/risk context.
+6. Apply safety and trade-policy controls.
+7. Return an actionable or no-trade decision.
+8. Record decisions and outcomes for later analysis and model improvement.
+
+Exact feature formulas, thresholds, model artifacts, training recipes and decision rules are deliberately excluded from the public repository.
+
+## Risk engineering
+
+Risk management is treated as a separate layer from model prediction. The full project explores controls including position sizing, stop-loss/take-profit handling, maximum concurrent trades, session restrictions and defensive no-trade behavior.
+
+The public repository documents these capabilities without publishing the proprietary parameterization used by the private research system.
+
+## Analytics
+
+Public analytics code demonstrates practical Python/Pandas work around trading and decision logs, including:
+
+- trade outcome aggregation;
+- win/loss and P&L statistics;
+- confidence distributions;
+- decision-reason analysis;
+- performance summaries;
+- structured report generation.
+
+These components are intentionally separated from the private trading strategy.
+
+## Repository boundary
+
+### Public here
+
+Architecture, selected analytics, documentation, safe utilities and portfolio evidence.
+
+### Kept private
+
+- trained `.pkl` model artifacts;
+- raw/historical market datasets;
+- broker/account credentials and API secrets;
+- exact feature-engineering formulas used by the active system;
+- proprietary scoring and confidence thresholds;
+- execution/override logic;
+- detailed risk parameterization;
+- complete MT5 Expert Advisor strategy implementation;
+- private trade and decision logs.
+
+## Project status
+
+NEXORA is under active research and development. Work includes model experimentation, analytics, risk controls, backtesting/forward-testing workflows and system architecture improvements. Claims of guaranteed profitability are intentionally avoided.
+
+## Security and IP
+
+No credentials, private datasets or trained model artifacts should be committed to this repository. See `SECURITY.md` and `MODEL_AND_DATA_POLICY.md` for repository boundaries.
+
+## License
+
+**Copyright 2026 NEXORA / Ashwin Thakoor. All Rights Reserved.**
+
+The source code, documentation and assets in this repository may not be copied, redistributed or modified without prior written permission. See `LICENSE` for the repository terms.
