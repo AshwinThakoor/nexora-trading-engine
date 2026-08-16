@@ -160,8 +160,6 @@ Do NOT:
 ---
 
 ## Development philosophy
-ChatGPT is the project architect and trading brain.
-Cursor is the coding engineer.
 
 Cursor should:
 - implement requested code changes
