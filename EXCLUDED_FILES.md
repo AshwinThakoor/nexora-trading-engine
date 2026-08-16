@@ -1,34 +1,90 @@
-# Excluded Files and Artifacts
+# Excluded Files & Private Components
 
-This repository export is intended to keep the trading-engine source clean, focused, and recruiter-ready.
+NEXORA's public repository is deliberately **not** the complete trading system. It is a portfolio-safe engineering surface designed to show architecture, Python/data skills and development discipline without publishing the active strategy.
 
-## Excluded artifact classes
+## Boundary at a glance
 
-- `data/`, `models/`, `logs/`
-  - Runtime CSV logs, raw candle data, model binaries, and generated datasets are excluded.
-- `analytics/reports/`
-  - Generated analysis summaries and live report outputs are excluded.
-- `analytics/features/*.txt`, `analytics/learning/*.txt`, `analytics/regimes/*.txt`
-  - Generated feature/regime summary files are excluded.
-- Backup and historical signal server snapshots:
-  - `signal_server_backup.py`
-  - `signal_server_old.py`
-  - `signal_server_phase13_5_backup.py`
-  - `signal_server_phase15_backup.py`
-- Local environment and audit files:
-  - `.venv/`, `.venv-1/`, `.venv-2/`, `.venv-3/`
-  - `__pycache__/`
-  - `*.csv`, `*.parquet`, `*.pkl`, `*.joblib`, `*.ex5`, `*.zip`, `*.sql`
-  - `project_tree.txt`, `repository_structure.txt`, `mt5_ai_bot_git_backup/`
+```mermaid
+flowchart LR
+    FULL[Full NEXORA Project] --> PUBLIC[Public Showcase]
+    FULL --> PRIVATE[Private IP]
+    FULL --> LOCAL[Local Runtime Artifacts]
 
-## Why these are excluded
+    PUBLIC --> DOCS[Docs / Diagrams]
+    PUBLIC --> ANALYTICS[Selected Analytics]
+    PUBLIC --> CI[Safe CI]
 
-- They are either generated from local runs,
-- or they contain binary / training artifacts that should not be part of the clean source export.
+    PRIVATE --> SIGNAL[Signal / Decision Logic]
+    PRIVATE --> EA[Complete MT5 EA]
+    PRIVATE --> MODEL[Models / Features]
 
-## What remains in repository source
+    LOCAL --> DATA[Datasets]
+    LOCAL --> LOGS[Trade / Decision Logs]
+    LOCAL --> REPORTS[Generated Reports]
+```
 
-- Production trading-server and Python application code.
-- Project documentation and architecture notes.
-- Offline tooling for rebuilding datasets from local data.
-- Scripts for model training, analytics, and signal server operation.
+## Explicitly excluded
+
+### Runtime data
+- `data/`
+- raw and historical candle datasets
+- generated training-event datasets
+- feature matrices
+- backtest/forward-test exports
+
+### Models
+- `models/`
+- `*.pkl`
+- `*.joblib`
+- runtime model metadata that reveals private feature/configuration details
+
+### Logs and generated analytics
+- `logs/`
+- `ai_trade_log.csv`
+- `ai_decision_log.csv`
+- generated analytics reports
+- local performance summaries
+
+### Proprietary implementation
+- active FastAPI signal-server implementation
+- complete MQL5 Expert Advisor strategy implementation
+- feature-engineering formulas used by the active model
+- model-training recipes that reproduce active behavior
+- tuned confidence/scoring thresholds
+- session/regime decision rules
+- detailed risk formulas and SL/TP parameterization
+- execution overrides and final strategy-fusion logic
+
+### Secrets and local environment
+- `.env` and environment-specific secrets
+- broker/account credentials
+- API tokens and keys
+- local virtual environments
+- cache/build artifacts
+- backups and local repository snapshots
+
+## Why useful code remains public
+
+A recruiter should still be able to inspect real engineering work. Selected analytics remain because they demonstrate:
+
+- Python/Pandas/NumPy usage;
+- defensive data loading and normalization;
+- performance metric calculation;
+- forward-return and directional evaluation;
+- confidence and segment analysis;
+- structured reporting;
+- modular code organization.
+
+Those skills are visible without revealing the rules that decide actual trades.
+
+## Historical note
+
+Some sensitive implementation existed in earlier public development history before the repository was converted into a sanitized showcase. Current `main` is the maintained public boundary. Git history requires separate sanitization if complete removal from historical commits is required, and previously cloned public history cannot be revoked.
+
+## See also
+
+- `MODEL_AND_DATA_POLICY.md`
+- `ARCHITECTURE.md`
+- `PROJECT_STRUCTURE.md`
+- `SECURITY.md`
+- `LICENSE`
